@@ -30,6 +30,12 @@ image:
 dev-build: image
 	cp -r ./scripts/pre-commit.sh ./.git/hooks/pre-commit
 
+.PHONY: ci-build
+ci-build: image
+	mkdir -p "$(CWD)/tmp/.cache/docker"
+	docker save "$(DEV_IMAGE)" | gzip > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar.gz"
+	$(BUILD_DOCKER) pre-commit install-hooks --color always
+
 .PHONY: test
 test:
 	$(INTERACTIVE_DOCKER) go test -v
