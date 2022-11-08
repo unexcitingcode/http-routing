@@ -7,7 +7,6 @@ BUILD_DOCKER := @docker run --rm \
     -v "$(CWD)/tmp/go:/opt/go/packages" \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -w "/opt/$(IMAGE)" \
-    -u $(id -u $(USER)):$(id -g $(USER)) \
     -t \
     $(DEV_IMAGE)
 INTERACTIVE_DOCKER := @docker run --rm \
@@ -16,7 +15,6 @@ INTERACTIVE_DOCKER := @docker run --rm \
     -v "$(CWD)/tmp/go:/opt/go/packages" \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -w "/opt/$(IMAGE)" \
-    -u $(id -u $(USER)):$(id -g $(USER)) \
     -it \
     $(DEV_IMAGE)
 
@@ -37,9 +35,7 @@ ci-build: image
 	mkdir -p "$(CWD)/tmp/.cache/docker"
 	docker save "$(DEV_IMAGE)" > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar"
 	$(BUILD_DOCKER) pre-commit install-hooks --color always
-	ls -al
-	ls -al tmp/.cache
-	ls -al tmp/.cache/pre-commit
+	sudo chmod -R ugo+r tmp
 
 .PHONY: ci-load
 ci-load:
