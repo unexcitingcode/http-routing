@@ -9,58 +9,106 @@ func TestDescriptionCompiler(t *testing.T) {
 	dsl := NewDescriptionCompiler[string]()
 	var tests = []struct {
 		name     string
-		result   []RouteDescription[string]
-		expected []RouteDescription[string]
+		result   Description[string]
+		expected Description[string]
 	}{
 		{
-			name:     "empty routes",
-			result:   dsl.Root("missing")(),
-			expected: []RouteDescription[string]{},
+			name:   "empty routes",
+			result: dsl.Root("missing")(),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes:  []RouteDescription[string]{},
+			},
 		},
 		{
-			name:     "top level get",
-			result:   dsl.Root("missing")(dsl.Get("GetAll")),
-			expected: []RouteDescription[string]{{Method: "GET", Endpoint: "GetAll"}},
+			name:   "top level get",
+			result: dsl.Root("missing")(dsl.Get("GetAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "GET", Endpoint: "GetAll"},
+				},
+			},
 		},
 		{
-			name:     "top level post",
-			result:   dsl.Root("missing")(dsl.Post("PostAll")),
-			expected: []RouteDescription[string]{{Method: "POST", Endpoint: "PostAll"}},
+			name:   "top level post",
+			result: dsl.Root("missing")(dsl.Post("PostAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "POST", Endpoint: "PostAll"},
+				},
+			},
 		},
 		{
-			name:     "top level put",
-			result:   dsl.Root("missing")(dsl.Put("PutAll")),
-			expected: []RouteDescription[string]{{Method: "PUT", Endpoint: "PutAll"}},
+			name:   "top level put",
+			result: dsl.Root("missing")(dsl.Put("PutAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "PUT", Endpoint: "PutAll"},
+				},
+			},
 		},
 		{
-			name:     "top level delete",
-			result:   dsl.Root("missing")(dsl.Delete("DeleteAll")),
-			expected: []RouteDescription[string]{{Method: "DELETE", Endpoint: "DeleteAll"}},
+			name:   "top level delete",
+			result: dsl.Root("missing")(dsl.Delete("DeleteAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "DELETE", Endpoint: "DeleteAll"},
+				},
+			},
 		},
 		{
-			name:     "top level options",
-			result:   dsl.Root("missing")(dsl.Options("OptionsAll")),
-			expected: []RouteDescription[string]{{Method: "OPTIONS", Endpoint: "OptionsAll"}},
+			name:   "top level options",
+			result: dsl.Root("missing")(dsl.Options("OptionsAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "OPTIONS", Endpoint: "OptionsAll"},
+				},
+			},
 		},
 		{
-			name:     "top level patch",
-			result:   dsl.Root("missing")(dsl.Patch("PatchAll")),
-			expected: []RouteDescription[string]{{Method: "PATCH", Endpoint: "PatchAll"}},
+			name:   "top level patch",
+			result: dsl.Root("missing")(dsl.Patch("PatchAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "PATCH", Endpoint: "PatchAll"},
+				},
+			},
 		},
 		{
-			name:     "top level head",
-			result:   dsl.Root("missing")(dsl.Head("HeadAll")),
-			expected: []RouteDescription[string]{{Method: "HEAD", Endpoint: "HeadAll"}},
+			name:   "top level head",
+			result: dsl.Root("missing")(dsl.Head("HeadAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "HEAD", Endpoint: "HeadAll"},
+				},
+			},
 		},
 		{
-			name:     "top level connect",
-			result:   dsl.Root("missing")(dsl.Connect("ConnectAll")),
-			expected: []RouteDescription[string]{{Method: "CONNECT", Endpoint: "ConnectAll"}},
+			name:   "top level connect",
+			result: dsl.Root("missing")(dsl.Connect("ConnectAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "CONNECT", Endpoint: "ConnectAll"},
+				},
+			},
 		},
 		{
-			name:     "top level trace",
-			result:   dsl.Root("missing")(dsl.Trace("TraceAll")),
-			expected: []RouteDescription[string]{{Method: "TRACE", Endpoint: "TraceAll"}},
+			name:   "top level trace",
+			result: dsl.Root("missing")(dsl.Trace("TraceAll")),
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "TRACE", Endpoint: "TraceAll"},
+				},
+			},
 		},
 		{
 			name: "single path",
@@ -68,9 +116,12 @@ func TestDescriptionCompiler(t *testing.T) {
 				dsl.Get("SignUpRender"),
 				dsl.Post("SignUpProcess"),
 			)),
-			expected: []RouteDescription[string]{
-				{Method: "GET", Path: "/sign_up", Endpoint: "SignUpRender"},
-				{Method: "POST", Path: "/sign_up", Endpoint: "SignUpProcess"},
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "GET", Path: "/sign_up", Endpoint: "SignUpRender"},
+					{Method: "POST", Path: "/sign_up", Endpoint: "SignUpProcess"},
+				},
 			},
 		},
 		{
@@ -85,11 +136,14 @@ func TestDescriptionCompiler(t *testing.T) {
 					dsl.Post("LogInProcess"),
 				),
 			),
-			expected: []RouteDescription[string]{
-				{Method: "GET", Path: "/sign_up", Endpoint: "SignUpRender"},
-				{Method: "POST", Path: "/sign_up", Endpoint: "SignUpProcess"},
-				{Method: "GET", Path: "/log_in", Endpoint: "LogInRender"},
-				{Method: "POST", Path: "/log_in", Endpoint: "LogInProcess"},
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "GET", Path: "/sign_up", Endpoint: "SignUpRender"},
+					{Method: "POST", Path: "/sign_up", Endpoint: "SignUpProcess"},
+					{Method: "GET", Path: "/log_in", Endpoint: "LogInRender"},
+					{Method: "POST", Path: "/log_in", Endpoint: "LogInProcess"},
+				},
 			},
 		},
 		{
@@ -97,8 +151,11 @@ func TestDescriptionCompiler(t *testing.T) {
 			result: dsl.Root("missing")(dsl.Path("/users")(dsl.Param("user_id")(
 				dsl.Get("FetchUserById"),
 			))),
-			expected: []RouteDescription[string]{
-				{Method: "GET", Path: "/users/{user_id}", Endpoint: "FetchUserById"},
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "GET", Path: "/users/{user_id}", Endpoint: "FetchUserById"},
+				},
 			},
 		},
 		{
@@ -111,11 +168,14 @@ func TestDescriptionCompiler(t *testing.T) {
 					dsl.Delete("DeleteUserById"),
 				),
 			)),
-			expected: []RouteDescription[string]{
-				{Method: "POST", Path: "/users", Endpoint: "CreateUser"},
-				{Method: "GET", Path: "/users/{user_id}", Endpoint: "FetchUserById"},
-				{Method: "PUT", Path: "/users/{user_id}", Endpoint: "UpdateUserById"},
-				{Method: "DELETE", Path: "/users/{user_id}", Endpoint: "DeleteUserById"},
+			expected: Description[string]{
+				Missing: "missing",
+				Routes: []RouteDescription[string]{
+					{Method: "POST", Path: "/users", Endpoint: "CreateUser"},
+					{Method: "GET", Path: "/users/{user_id}", Endpoint: "FetchUserById"},
+					{Method: "PUT", Path: "/users/{user_id}", Endpoint: "UpdateUserById"},
+					{Method: "DELETE", Path: "/users/{user_id}", Endpoint: "DeleteUserById"},
+				},
 			},
 		},
 	}

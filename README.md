@@ -7,4 +7,3 @@ is express a language for routing http requests. It doesn't make an effort to
 complicate itself with the concerns of data validation, request body parsing,
 header extraction, response body serialization, etc. All fo these other
 concerns can and should be expressed in their own independent DSLs elsewhere.
-

@@ -2,8 +2,13 @@ package http_routing
 
 type DescriptionCompiler[Endpoint any] struct{}
 
-func NewDescriptionCompiler[Endpoint any]() Compiler[Endpoint, []RouteDescription[Endpoint], []RouteDescription[Endpoint]] {
+func NewDescriptionCompiler[Endpoint any]() Compiler[Endpoint, []RouteDescription[Endpoint], Description[Endpoint]] {
 	return DescriptionCompiler[Endpoint]{}
+}
+
+type Description[Endpoint any] struct {
+	Missing Endpoint
+	Routes  []RouteDescription[Endpoint]
 }
 
 type RouteDescription[Endpoint any] struct {
@@ -13,39 +18,35 @@ type RouteDescription[Endpoint any] struct {
 }
 
 func (description RouteDescription[Endpoint]) prefixedWithPath(prefix string) RouteDescription[Endpoint] {
-	return RouteDescription[Endpoint]{description.Method, prefix + description.Path, description.Endpoint}
+	return RouteDescription[Endpoint]{
+		Method:   description.Method,
+		Path:     prefix + description.Path,
+		Endpoint: description.Endpoint,
+	}
 }
 
 func (description RouteDescription[Endpoint]) prefixedWithParam(name string) RouteDescription[Endpoint] {
-	return RouteDescription[Endpoint]{description.Method, "/{" + name + description.Path + "}", description.Endpoint}
+	return RouteDescription[Endpoint]{
+		Method:   description.Method,
+		Path:     "/{" + name + description.Path + "}",
+		Endpoint: description.Endpoint,
+	}
 }
 
 func prefixBranches[Endpoint any](
 	prefix func(description RouteDescription[Endpoint]) RouteDescription[Endpoint],
 ) func(branches ...[]RouteDescription[Endpoint]) []RouteDescription[Endpoint] {
 	return func(branches ...[]RouteDescription[Endpoint]) []RouteDescription[Endpoint] {
-		descriptionCount := 0
-		for _, branch := range branches {
-			descriptionCount += len(branch)
-		}
-		out := make([]RouteDescription[Endpoint], descriptionCount)
-		outOffset := 0
-		for _, branch := range branches {
-			for _, description := range branch {
-				out[outOffset] = prefix(description)
-				outOffset += 1
-			}
-		}
-		return out
+		return flattenThenMap(branches, prefix)
 	}
 }
 
 func (describer DescriptionCompiler[Endpoint]) Root(
 	missing Endpoint,
-) func(branches ...[]RouteDescription[Endpoint]) []RouteDescription[Endpoint] {
-	return prefixBranches(func(description RouteDescription[Endpoint]) RouteDescription[Endpoint] {
-		return description
-	})
+) func(branches ...[]RouteDescription[Endpoint]) Description[Endpoint] {
+	return func(branches ...[]RouteDescription[Endpoint]) Description[Endpoint] {
+		return Description[Endpoint]{Missing: missing, Routes: flatten(branches)}
+	}
 }
 
 func (describer DescriptionCompiler[Endpoint]) Path(

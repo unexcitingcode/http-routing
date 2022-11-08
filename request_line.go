@@ -32,18 +32,25 @@ func NewRequestLineCompiler[Endpoint any]() Compiler[Endpoint, RequestLineBranch
 	return RequestLineCompiler[Endpoint]{}
 }
 
+func applyBranch[Endpoint any](
+	method string,
+	remaining string,
+) func(branch RequestLineBranch[Endpoint]) *RequestLineMatch[Endpoint] {
+	return func(branch RequestLineBranch[Endpoint]) *RequestLineMatch[Endpoint] {
+		return branch(method, remaining)
+	}
+}
+
 func (compiler RequestLineCompiler[Endpoint]) Root(
 	missing Endpoint,
 ) func(branches ...RequestLineBranch[Endpoint]) RequestLineRoot[Endpoint] {
 	return func(branches ...RequestLineBranch[Endpoint]) RequestLineRoot[Endpoint] {
 		return func(line RequestLine) RequestLineMatch[Endpoint] {
-			for _, branch := range branches {
-				match := branch(line.Method, line.Path)
-				if match != nil {
-					return *match
-				}
+			match := mapFind(branches, applyBranch[Endpoint](line.Method, line.Path))
+			if match == nil {
+				return RequestLineMatch[Endpoint]{missing, map[string]string{}}
 			}
-			return RequestLineMatch[Endpoint]{missing, map[string]string{}}
+			return *match
 		}
 	}
 }
@@ -57,13 +64,7 @@ func (compiler RequestLineCompiler[Endpoint]) Path(
 				return nil
 			}
 			newRemaining := remaining[len(prefix):]
-			for _, branch := range branches {
-				match := branch(method, newRemaining)
-				if match != nil {
-					return match
-				}
-			}
-			return nil
+			return mapFind(branches, applyBranch[Endpoint](method, newRemaining))
 		}
 	}
 }
@@ -76,23 +77,12 @@ func (compiler RequestLineCompiler[Endpoint]) Param(
 			if !strings.HasPrefix(remaining, "/") {
 				return nil
 			}
-			prefixDropped := remaining[1:]
-			slashOffset := strings.IndexByte(prefixDropped, '/')
-			var capture, newRemaining string
-			if slashOffset == -1 {
-				capture = prefixDropped
-				newRemaining = ""
-			} else {
-				capture = prefixDropped[:slashOffset]
-				newRemaining = prefixDropped[slashOffset:]
+			capture, newRemaining := takeUntilByte(remaining[1:], '/')
+			match := mapFind(branches, applyBranch[Endpoint](method, newRemaining))
+			if match == nil {
+				return nil
 			}
-			for _, branch := range branches {
-				match := branch(method, newRemaining)
-				if match != nil {
-					return match.withParam(name, capture)
-				}
-			}
-			return nil
+			return match.withParam(name, capture)
 		}
 	}
 }
