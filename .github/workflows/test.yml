@@ -30,7 +30,7 @@ jobs:
           path: tmp
           key: deps-${{ runner.os }}-${{ hashFiles('go.mod', '.pre-commit-config.yaml', 'Dockerfile', 'scripts/**') }}
       - name: Load the developer image
-        run: make load-ci
+        run: make ci-load
       - name: Run the go tests
         run: make test
   pre-commit:
@@ -45,6 +45,6 @@ jobs:
           path: tmp
           key: deps-${{ runner.os }}-${{ hashFiles('go.mod', '.pre-commit-config.yaml', 'Dockerfile', 'scripts/**') }}
       - name: Load the developer image
-        run: make load-ci
+        run: make ci-load
       - name: Run pre-commit on everything
         run: make pre-commit-all
