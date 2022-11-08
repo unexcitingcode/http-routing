@@ -37,6 +37,8 @@ ci-build: image
 	mkdir -p "$(CWD)/tmp/.cache/docker"
 	docker save "$(DEV_IMAGE)" > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar"
 	$(BUILD_DOCKER) pre-commit install-hooks --color always
+	ls -al
+	ls -al tmp/.cache
 	ls -al tmp/.cache/pre-commit
 
 .PHONY: ci-load
