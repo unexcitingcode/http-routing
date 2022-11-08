@@ -36,6 +36,10 @@ ci-build: image
 	docker save "$(DEV_IMAGE)" | gzip > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar.gz"
 	$(BUILD_DOCKER) pre-commit install-hooks --color always
 
+.PHONY: ci-load
+ci-load:
+	docker load < "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar.gz"
+
 .PHONY: test
 test:
 	$(INTERACTIVE_DOCKER) go test -v
