@@ -20,6 +20,7 @@ jobs:
         run: make ci-build
   test:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v3
       - name: Cache dependencies and dev image
@@ -32,6 +33,7 @@ jobs:
         run: make test
   pre-commit:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v3
       - name: Cache dependencies and dev image
