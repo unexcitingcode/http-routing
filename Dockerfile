@@ -3,7 +3,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG TARGETOS
 ARG TARGETARCH
 RUN apt-get update -y && \
-    apt-get install -qq --no-install-recommends -y \
+    apt-get install --no-install-recommends -y \
         curl=7.74.0-1.3+deb11u3 \
         git=1:2.30.2-1 \
         pre-commit=2.10.1-1 && \
