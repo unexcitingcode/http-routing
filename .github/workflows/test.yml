@@ -1,9 +1,9 @@
-name: Docker Image CI
+name: Test Workflow
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ 'main' ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,3 +18,33 @@ jobs:
       - name: Build the developer docker image
         if: steps.dependency-cache.outputs.cache-hit != 'true'
         run: make ci-build
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies and dev image
+        id: dependency-cache
+        uses: actions/cache@v3
+        with:
+          path: tmp
+          key: deps-${{ runner.os }}-${{ hashFiles('go.mod', '.pre-commit-config.yaml', 'Dockerfile', 'scripts/**') }}
+      - name: Load the developer image
+        run: make ci-load
+      - name: Run the go tests
+        run: make test
+  pre-commit:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache dependencies and dev image
+        id: dependency-cache
+        uses: actions/cache@v3
+        with:
+          path: tmp
+          key: deps-${{ runner.os }}-${{ hashFiles('go.mod', '.pre-commit-config.yaml', 'Dockerfile', 'scripts/**') }}
+      - name: Load the developer image
+        run: make ci-load
+      - name: Run pre-commit on everything
+        run: make pre-commit-all

@@ -33,12 +33,17 @@ dev-build: image
 .PHONY: ci-build
 ci-build: image
 	mkdir -p "$(CWD)/tmp/.cache/docker"
-	docker save "$(DEV_IMAGE)" | gzip > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar.gz"
+	docker save "$(DEV_IMAGE)" > "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar"
 	$(BUILD_DOCKER) pre-commit install-hooks --color always
+	sudo chown -R runner:docker tmp
+
+.PHONY: ci-load
+ci-load:
+	docker load < "$(CWD)/tmp/.cache/docker/$(DEV_IMAGE).tar"
 
 .PHONY: test
 test:
-	$(INTERACTIVE_DOCKER) go test -v
+	$(BUILD_DOCKER) go test -v
 
 .PHONY: pre-commit
 pre-commit:
