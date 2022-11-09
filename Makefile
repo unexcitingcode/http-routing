@@ -43,7 +43,7 @@ ci-load:
 
 .PHONY: test
 test:
-	$(INTERACTIVE_DOCKER) go test -v
+	$(BUILD_DOCKER) go test -v
 
 .PHONY: pre-commit
 pre-commit:
